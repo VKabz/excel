@@ -6,25 +6,30 @@ const charIndex = {
 
 
 
-function createAlphabetColumn(string) {
-    return `
-        <div class="column">
-            ${string}
-        </div>
-    `
+function createAlphabetColumn(_, index) {
+        return `
+            <div class="column" data-type="resizable" data-col=${index}>
+                ${String.fromCharCode(charIndex.A + index)}
+                <div class="col-resize" data-resize="col"></div>
+            </div>
+        `
 }
 
 
-function createCell(string) {
-    return `
-        <div class="cell" contenteditable="">${string}</div>
-    `
+function createCell(rowIndex) {
+   return (_, index) => `<div class="cell" data-col=${index} data-id=${`${rowIndex}:${index}`} contenteditable=""></div>`
 }
 
-function getColumn(content = '', info = '') {
+
+function getColumn(content, info) {
+
+    const resize = info !== null ? '<div class="row-resize" data-resize="row"></div>' : ''
+
     return `
-        <div class="row">
-            <div class="row-info">${info}</div>
+        <div data-type="resizable" class="row">
+            <div class="row-info">${info !== null ? info : ''}
+            ${resize}
+            </div>
             <div class="row-data">
                 ${content}
             </div>
@@ -40,18 +45,17 @@ export function createColumn(rowsCount = 15) {
 
     let firstColumns = new Array(charDifference)
         .fill('')
-        .map((_, index) => createAlphabetColumn(String.fromCharCode(charIndex.A + index)))
+        .map(createAlphabetColumn)
         .join('')
 
-    tablesArray.push(getColumn(firstColumns))
+    tablesArray.push(getColumn(firstColumns, null))
 
     for (let i = 0; i < rowsCount; i++) {
-
         let cels = new Array(charDifference)
             .fill('')
-            .map((_, index) => createCell(`${String.fromCharCode(charIndex.A + index)}${i+1}`))
+            .map(createCell(i))
             .join('')
-
+            
         tablesArray.push(getColumn(cels, i+1))
     }
 
